@@ -32,10 +32,7 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
-        arguments: shadowJar
-      env:
-        USERNAME: ${{ github.actor }}
-        TOKEN: ${{ secrets.TOKEN }}
+        arguments: build
     - name: Publish artifacts
       uses: actions/upload-artifact@v3
       with:
