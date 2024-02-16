@@ -6,6 +6,8 @@ import the.grid.smp.desertum.Desertum;
 
 public class DesertumConfig extends Config {
 
+    private String desertedWorld;
+
     private final Desertum desertum;
 
     public DesertumConfig(Desertum desertum) {
@@ -15,11 +17,9 @@ public class DesertumConfig extends Config {
 
     @Override
     public void read(ConfigurationSection section) {
-
+        this.desertedWorld = section.getString("deserted-world");
     }
 
     @Override
-    public void write(ConfigurationSection section) {
-
-    }
+    public void write(ConfigurationSection section) { }
 }
