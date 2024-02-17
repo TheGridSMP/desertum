@@ -1,63 +1,61 @@
 package the.grid.smp.desertum.inspector;
 
-import org.bukkit.*;
+import me.angeschossen.lands.api.LandsIntegration;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import the.grid.smp.desertum.Desertum;
+import the.grid.smp.desertum.config.DesertumConfig;
 import the.grid.smp.desertum.data.ChunkPos;
-import the.grid.smp.desertum.data.Region;
-import the.grid.smp.desertum.util.WorldUtil;
-
-import java.util.Collection;
+import the.grid.smp.desertum.db.ChunkDatabase;
 
 public class Inspector {
-
     private final Desertum desertum;
+    private final ChunkDatabase db;
 
     public Inspector(Desertum desertum) {
         this.desertum = desertum;
-        this.desertum.getServer().getScheduler().runTaskLater(desertum, this::start, 1L);
-    }
+        this.db = new ChunkDatabase(desertum);
 
-    public void start() {
-        World world = this.desertum.getWorldManager().getMainWorld();
-        Collection<Region> regions = WorldUtil.getRegions(this.desertum, world);
+        DesertumConfig config = this.desertum.config();
+        long delay = config.getDelay();
 
-        for (Region region : regions) {
-            for (ChunkPos pos : region.getGeneratedChunks(world)) {
-                this.inspectChunk(world, pos);
-            }
-        }
-    }
-
-    private void inspectChunk(World world, ChunkPos pos) {
-        this.inspectChunk(world.getChunkAt(pos.x(), pos.z()));
-    }
-
-    private void inspectChunk(Chunk chunk) {
-        this.inspectSnapshot(chunk.getChunkSnapshot(false, false, false));
-    }
-
-    private void inspectSnapshot(ChunkSnapshot snapshot) {
-        int startX = snapshot.getX() * 16;
-        int startZ = snapshot.getZ() * 16;
-
-        int endX = startX+15;
-        int endZ = startZ+15;
-
-        for (int x = startX; x < endX; x++) {
-            for (int y = 0; y < 320; y++) {
-                for (int z = 0; z < endZ; z++) {
-                    if (Inspector.playerMade(snapshot.getBlockType(x, y, z))) {
-                        this.desertum.getLogger().severe("Chunk at " + snapshot.getX() + ":" + snapshot.getZ() + " has player stuff! Leaving untouched...");
-                        break;
-                    }
+        this.desertum.getServer().getScheduler().runTaskTimerAsynchronously(this.desertum, () -> {
+            for (ChunkPos pos : this.db.getChunks(config.getMaxInactivity())) {
+                if (this.isProtected(pos)) {
+                    this.db.remove(pos);
+                    continue;
                 }
-            }
-        }
 
-        this.desertum.getLogger().severe("Chunk at " + snapshot.getX() + ":" + snapshot.getZ() + " doesnt have player stuff! Can be purged!");
+                this.desertum.getLogger().warning("Chunk at " + pos + " can be purged!");
+            }
+        }, delay, delay);
     }
 
-    private static boolean playerMade(Material material) {
-        return Tag.BEDS.isTagged(material) || material == Material.CHEST || material == Material.ENDER_CHEST;
+    public void reset() {
+        this.db.close();
+    }
+
+    public void interact(Block block) {
+        this.interact(block.getChunk());
+    }
+
+    public void interact(Location location) {
+        this.interact(location.getChunk());
+    }
+
+    public void interact(Chunk chunk) {
+        this.db.setChunk(new ChunkPos(chunk), chunk.getWorld().getFullTime());
+    }
+
+    private boolean isProtected(ChunkPos pos) {
+        if (!this.desertum.getServer().getPluginManager().isPluginEnabled("Lands"))
+            return false;
+
+        World mainWorld = this.desertum.getWorldManager().getMainWorld();
+
+        LandsIntegration lands = LandsIntegration.of(this.desertum);
+        return lands.getLandByUnloadedChunk(mainWorld, pos.x(), pos.z()) == null;
     }
 }

@@ -1,2 +1,8 @@
 deserted-world: deserted
-main-world: World
+main-world: world
+
+# in minutes. requires a restart to apply.
+delay: 120
+
+# irl days.
+max-inactivity: 30

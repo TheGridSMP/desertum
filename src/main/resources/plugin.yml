@@ -2,3 +2,15 @@ name: desertum
 version: '${version}'
 main: the.grid.smp.desertum.Desertum
 api-version: '1.20'
+softdepend:
+  - Lands
+commands:
+  desertum:
+    usage: /desertum [purge] <x> <z>
+    permission: desertum.command
+permissions:
+  desertum.command:
+    default: op
+    children:
+      desertum.command.purge:
+        default: op
