@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import the.grid.smp.desertum.Desertum;
-import the.grid.smp.desertum.config.DesertumConfig;
 import the.grid.smp.desertum.data.ChunkPos;
 import the.grid.smp.desertum.db.ChunkDatabase;
 
@@ -18,19 +17,23 @@ public class Inspector {
         this.desertum = desertum;
         this.db = new ChunkDatabase(desertum);
 
-        DesertumConfig config = this.desertum.config();
-        long delay = config.getDelay();
+        long delay = this.desertum.config().getDelay();
+        this.desertum.getServer().getScheduler().runTaskTimerAsynchronously(this.desertum, () -> this.inspect(), delay, delay);
+    }
 
-        this.desertum.getServer().getScheduler().runTaskTimerAsynchronously(this.desertum, () -> {
-            for (ChunkPos pos : this.db.getChunks(config.getMaxInactivity())) {
-                if (this.isProtected(pos)) {
-                    this.db.remove(pos);
-                    continue;
-                }
+    public void inspect() {
+        for (ChunkPos pos : this.db.getChunks(this.desertum.config().getMaxInactivity())) {
+            this.inspect(pos);
+        }
+    }
 
-                this.desertum.getLogger().warning("Chunk at " + pos + " can be purged!");
-            }
-        }, delay, delay);
+    public void inspect(ChunkPos pos) {
+        if (this.isProtected(pos)) {
+            this.db.remove(pos);
+            return;
+        }
+
+        this.desertum.getLogger().warning("Chunk at " + pos + " can be purged!");
     }
 
     public void reset() {

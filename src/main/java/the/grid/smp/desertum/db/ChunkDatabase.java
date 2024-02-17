@@ -42,7 +42,10 @@ public class ChunkDatabase {
     }
 
     public void setChunk(int x, int z, long updated) {
-        this.db.update("INSERT INTO %s (x, z, updated) values (%d, %d, %d)", TABLE, x, z, updated);
+        this.db.update("INSERT INTO %s (x, z, updated) values (%d, %d, %d) " +
+                        "ON DUPLICATE KEY UPDATE x = %d, z = %d, updated = %d",
+                TABLE, x, z, updated, x, z, updated
+        );
     }
 
     public void remove(ChunkPos pos) {

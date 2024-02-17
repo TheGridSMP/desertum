@@ -6,11 +6,13 @@ softdepend:
   - Lands
 commands:
   desertum:
-    usage: /desertum [purge] <x> <z>
+    usage: /desertum [purge|inspect] <x> <z>
     permission: desertum.command
 permissions:
   desertum.command:
     default: op
     children:
       desertum.command.purge:
+        default: op
+      desertum.command.inspect:
         default: op
