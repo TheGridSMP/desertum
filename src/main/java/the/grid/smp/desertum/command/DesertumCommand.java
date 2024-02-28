@@ -43,10 +43,9 @@ public class DesertumCommand implements TabExecutor {
                     return false;
 
                 if (args.length == 3) {
-                    int x = Integer.parseInt(args[1]);
-                    int z = Integer.parseInt(args[2]);
+                    ChunkPos pos = this.getCords(sender, args[1], args[2]);
 
-                    this.desertum.getInspector().inspect(new ChunkPos(x, z));
+                    this.desertum.getInspector().inspect(pos);
                     return true;
                 }
 
