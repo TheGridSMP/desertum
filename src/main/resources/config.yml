@@ -1,5 +1,5 @@
 deserted-world: deserted
-main-world: world
+main-world: MagnaVita
 
 # in minutes. requires a restart to apply.
 delay: 120

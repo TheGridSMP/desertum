@@ -1,9 +1,11 @@
 package the.grid.smp.desertum.command;
 
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
 import the.grid.smp.desertum.Desertum;
 import the.grid.smp.desertum.data.ChunkPos;
 import the.grid.smp.desertum.util.WorldUtil;
@@ -28,13 +30,12 @@ public class DesertumCommand implements TabExecutor {
                 if (!sender.hasPermission("desertum.command.purge"))
                     return false;
 
-                int x = Integer.parseInt(args[1]);
-                int z = Integer.parseInt(args[2]);
+                ChunkPos pos = this.getCords(sender, args[1], args[2]);
 
                 World main = this.desertum.getWorldManager().getMainWorld();
                 World deserted = this.desertum.getWorldManager().getDesertedWorld();
 
-                WorldUtil.copy(this.desertum, deserted.getChunkAt(x, z), main.getChunkAt(x, z));
+                WorldUtil.copy(this.desertum, deserted.getChunkAt(pos.x(), pos.z()), main.getChunkAt(pos.x(), pos.z()));
             }
 
             case "inspect" -> {
@@ -58,6 +59,32 @@ public class DesertumCommand implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length == 1)
+            return List.of("inspect", "purge", "reset");
+
         return List.of();
+    }
+
+    private ChunkPos getCords(CommandSender sender, String arg1, String arg2) {
+        Integer x = null;
+        Integer z = null;
+
+        if (sender instanceof Player player) {
+            Chunk chunk = player.getLocation().getChunk();
+
+            if (arg1.equals("~"))
+                x = chunk.getX();
+
+            if (arg2.equals("~"))
+                z = chunk.getZ();
+        }
+
+        if (x == null)
+            x = Integer.parseInt(arg1);
+
+        if (z == null)
+            z = Integer.parseInt(arg2);
+
+        return new ChunkPos(x, z);
     }
 }

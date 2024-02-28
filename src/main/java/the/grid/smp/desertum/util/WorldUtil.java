@@ -12,21 +12,21 @@ public class WorldUtil {
     private static final int STEP = 2;
 
     public static void copy(Plugin plugin, Chunk from, Chunk to) {
-        step(plugin, from, to, -1);
+        step(plugin, from, to, -1, System.currentTimeMillis());
     }
 
-    private static void step(Plugin plugin, Chunk from, Chunk to, int step) {
+    private static void step(Plugin plugin, Chunk from, Chunk to, int step, long time) {
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             int startY = step * STEP;
             int endY = startY + STEP;
 
-            if (startY == MAX_HEIGHT)
+            if (startY == MAX_HEIGHT) {
+                plugin.getLogger().info("Purged chunk at: " + from.getX() + ":" + from.getZ() + " in: " + (System.currentTimeMillis() - time));
                 return;
-
-            plugin.getLogger().info("[" + step + "] Purge: from " + startY + " to " + endY);
+            }
 
             copy(from, to, startY, endY);
-            step(plugin, from, to, step + 1);
+            step(plugin, from, to, step + 1, time);
         }, 1);
     }
 
