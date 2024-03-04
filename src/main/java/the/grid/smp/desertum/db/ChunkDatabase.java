@@ -42,10 +42,7 @@ public class ChunkDatabase {
     }
 
     public void setChunk(int x, int z, long updated) {
-        this.db.update("INSERT INTO %s (x, z, updated) values (%d, %d, %d) " +
-                        "ON CONFLICT (x, z) DO UPDATE SET x = %d, z = %d, updated = %d",
-                TABLE, x, z, updated, x, z, updated
-        );
+        this.db.update("UPDATE %s SET updated = %d WHERE x = %d AND z = %d", TABLE, updated, x, z);
     }
 
     public void remove(ChunkPos pos) {
