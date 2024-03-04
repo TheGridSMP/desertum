@@ -12,7 +12,7 @@ public class WorldUtil {
     private static final int STEP = 2;
 
     public static void copy(Plugin plugin, Chunk from, Chunk to) {
-        step(plugin, from, to, -1, System.currentTimeMillis());
+        step(plugin, from, to, MIN_HEIGHT / STEP, System.currentTimeMillis());
     }
 
     private static void step(Plugin plugin, Chunk from, Chunk to, int step, long time) {
