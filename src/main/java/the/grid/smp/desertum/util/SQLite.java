@@ -38,6 +38,7 @@ public class SQLite {
             consumer.accept(result);
         } catch (SQLException e) {
             this.logger.severe("Couldn't execute query '" + query + "': " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -48,6 +49,7 @@ public class SQLite {
             statement.executeUpdate(update);
         } catch (SQLException e) {
             this.logger.severe("Couldn't execute update '" + update + "': " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
